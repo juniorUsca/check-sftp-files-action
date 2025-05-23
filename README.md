@@ -38,8 +38,9 @@ Example: `^registry.*\.json$,^package.*\.json$`
 
 Specifies whether the action should fail if files are not found. Default is `'false'`. Set to `'true'` to enable this behavior.
 If set to `'true'`:
-- When `file-patterns` are used, the action fails if no files are found that match the specified patterns.
+- When `file-patterns` are used, the action fails if any of the specified patterns do not match any files.
 - When `file-names` are used, the action fails if any of the specified files are not found.
+- If no files are found at all, the action fails regardless of the input.
 
 
 ## Outputs
@@ -52,10 +53,18 @@ The file names that were checked. Array of strings.
 
 If file-names input is provided, this output will contain the file names that were not found on the remote server. Array of strings.
 
+### `file-patterns`
+
+The file patterns that were checked. Array of strings.
+
+### `file-patterns-not-found`
+
+If file-patterns input is provided, this output will contain the file patterns that were not found on the remote server. Array of strings.
+
 ## Example usage
 
 ```yaml
-uses: juniorUsca/check-sftp-files@v1
+uses: juniorUsca/check-sftp-files-action@v1
 with:
   host: 'example.com'
   port: '22'

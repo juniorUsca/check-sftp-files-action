@@ -70,6 +70,7 @@ conn.on('ready', () => {
         }))
 
       const listNotFound = filesToCheck.filter(fileInput => !listChecked.some(file => file.filename === fileInput))
+      const listNotFoundPatterns = filePatternsToCheck.filter(pattern => !listChecked.some(file => file.filename.match(pattern) !== null))
 
       core.setOutput('file-names', JSON.stringify(
         listChecked.map(file => file.filename)
@@ -77,14 +78,40 @@ conn.on('ready', () => {
       core.setOutput('file-names-not-found', JSON.stringify(
         listNotFound
       ))
+      core.setOutput('file-patterns', JSON.stringify(
+        filePatternsToCheck.filter(pattern => listChecked.some(file => file.filename.match(pattern) !== null))
+      ))
+      core.setOutput('file-patterns-not-found', JSON.stringify(
+        listNotFoundPatterns
+      ))
 
       if (listNotFound.length > 0) {
         console.log('Some file names were not found in the remote directory')
+        console.log('Number of files not found:', listNotFound.length)
         console.log('Files not found:', listNotFound.join(', '))
 
         if (failIfNoFiles) {
+          console.log('Number of files found:', listChecked.length)
+          console.log('Files found:', listChecked.map(file => file.filename).join(', '))
+          console.log('-------------------------')
           console.log('Failing the action because some file names were not found in the remote directory')
           core.setFailed('Some file names were not found in the remote directory')
+
+          conn.end()
+          return
+        }
+      }
+      if (listNotFoundPatterns.length > 0) {
+        console.log('Some file patterns were not found in the remote directory')
+        console.log('Number of file patterns not found:', listNotFoundPatterns.length)
+        console.log('File patterns not found:', listNotFoundPatterns.map(pattern => pattern.toString()).join(', '))
+
+        if (failIfNoFiles) {
+          console.log('Number of files found:', listChecked.length)
+          console.log('Files found:', listChecked.map(file => file.filename).join(', '))
+          console.log('-------------------------')
+          console.log('Failing the action because some file patterns were not found in the remote directory')
+          core.setFailed('Some file patterns were not found in the remote directory')
 
           conn.end()
           return
@@ -105,6 +132,8 @@ conn.on('ready', () => {
 
       console.log('Number of files found:', listChecked.length)
       console.log('Files found:', listChecked.map(file => file.filename).join(', '))
+
+      conn.end()
     })
 
   })

@@ -33,3 +33,7 @@ outputs:
     description: 'Array of strings of files found'
   file-names-not-found:
     description: 'Array of strings of files not found'
+  file-patterns:
+    description: 'Array of strings of file patterns found'
+  file-patterns-not-found:
+    description: 'Array of strings of file patterns not found'
