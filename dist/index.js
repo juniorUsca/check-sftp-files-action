@@ -49247,10 +49247,14 @@ conn.on('ready', () => {
                 size: file.attrs.size,
             }));
             const listNotFound = filesToCheck.filter(fileInput => !listChecked.some(file => file.filename === fileInput));
-            const listNotFoundPatterns = filePatternsToCheck.filter(pattern => !listChecked.some(file => file.filename.match(pattern) !== null));
+            const listNotFoundPatterns = filePatternsToCheck
+                .filter(pattern => !listChecked.some(file => file.filename.match(pattern) !== null))
+                .map(pattern => pattern.source);
             core.setOutput('file-names', JSON.stringify(listChecked.map(file => file.filename)));
             core.setOutput('file-names-not-found', JSON.stringify(listNotFound));
-            core.setOutput('file-patterns', JSON.stringify(filePatternsToCheck.filter(pattern => listChecked.some(file => file.filename.match(pattern) !== null))));
+            core.setOutput('file-patterns', JSON.stringify(filePatternsToCheck
+                .filter(pattern => listChecked.some(file => file.filename.match(pattern) !== null))
+                .map(pattern => pattern.source)));
             core.setOutput('file-patterns-not-found', JSON.stringify(listNotFoundPatterns));
             if (listNotFound.length > 0) {
                 console.log('Some file names were not found in the remote directory');
@@ -49269,7 +49273,7 @@ conn.on('ready', () => {
             if (listNotFoundPatterns.length > 0) {
                 console.log('Some file patterns were not found in the remote directory');
                 console.log('Number of file patterns not found:', listNotFoundPatterns.length);
-                console.log('File patterns not found:', listNotFoundPatterns.map(pattern => pattern.toString()).join(', '));
+                console.log('File patterns not found:', listNotFoundPatterns.join(', '));
                 if (failIfNoFiles) {
                     console.log('Number of files found:', listChecked.length);
                     console.log('Files found:', listChecked.map(file => file.filename).join(', '));
